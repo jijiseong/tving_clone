@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 const Nav = styled(motion.nav)`
   width: 100%;
-  height: 60px;
+  height: 100px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,7 +21,6 @@ const Col = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
 const Items = styled.ul`
   display: flex;
   justify-content: center;
@@ -29,13 +28,13 @@ const Items = styled.ul`
   list-style: none;
 `;
 const Item = styled.li`
-  margin-left: 20px;
+  margin-left: 40px;
   position: relative;
   display: flex;
   justify-content: center;
   flex-direction: column;
+  font-size: 24px;
 `;
-
 const Circle = styled(motion.span)`
   position: absolute;
   bottom: -7px;
@@ -47,7 +46,6 @@ const Circle = styled(motion.span)`
   background-color: ${(props) => props.theme.red};
   border-radius: 50%;
 `;
-
 const SearchButton = styled(motion.span)`
   margin-right: 50px;
   cursor: pointer;
@@ -55,18 +53,16 @@ const SearchButton = styled(motion.span)`
   align-items: center;
   position: relative;
 `;
-
 const Input = styled(motion.input)`
   transform-origin: right center;
   position: absolute;
   right: 0px;
   background-color: inherit;
   border: 1px solid white;
-  height: 40px;
-  width: 260px;
+  height: 55px;
+  width: 300px;
   padding-left: 50px;
   padding-right: 30px;
-
   z-index: -1;
   text-align: right;
   color: ${(props) => props.theme.white.lighter};
@@ -74,13 +70,14 @@ const Input = styled(motion.input)`
   font-size: 18px;
 `;
 const Svg = styled(motion.svg)`
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
 `;
 
 function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch = useMatch("/");
+  const modalMatch = useMatch("/movies/:title/:id");
   const tvMatch = useMatch("/tv");
   const { scrollY } = useScroll();
   const background = useTransform(
@@ -105,7 +102,8 @@ function Header() {
         <Items>
           <Item>
             <Link to="/">
-              Home {homeMatch ? <Circle layoutId="circle" /> : null}
+              Home
+              {homeMatch || modalMatch ? <Circle layoutId="circle" /> : null}
             </Link>
           </Item>
           <Item>
@@ -119,7 +117,7 @@ function Header() {
         <SearchButton>
           <Svg
             initial={{ x: 0 }}
-            animate={{ x: searchOpen ? -220 : 0 }}
+            animate={{ x: searchOpen ? -250 : 0 }}
             transition={{ ease: "easeOut" }}
             onClick={toggleSearch}
             xmlns="http://www.w3.org/2000/svg"
