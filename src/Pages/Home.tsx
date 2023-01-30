@@ -7,15 +7,20 @@ import {
   IMovie,
 } from "../utils/api";
 import { makeImagePath } from "../utils/utils";
-import MovieSection from "../Components/MovieSection";
 import MovieModal from "../Components/MovieModal";
 import { useMatch } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Header from "../Components/Header";
+import Slider from "../Components/Slider";
+import Movie from "../Components/Movie";
 
 const Wrapper = styled.div`
-  background-color: black;
   height: 200vh;
+`;
+const Body = styled.div`
+  width: 100%;
+  position: relative;
+  top: -200px;
 `;
 
 const Loader = styled.div`
@@ -39,11 +44,6 @@ const Title = styled.h2`
   margin-bottom: 20px;
   font-size: 68px;
 `;
-const Body = styled.div`
-  width: 100%;
-  position: relative;
-  top: -200px;
-`;
 
 function Home() {
   const { data: nowPlaying, isLoading: nowPlayingLoading } =
@@ -66,30 +66,47 @@ function Home() {
   return (
     <Wrapper>
       <Header />
+      {/* ============= Banner ================*/}
       {nowPlayingLoading || !nowPlaying ? (
         <Loader>"loading"</Loader>
       ) : (
-        <>
-          <Banner
-            bgPhoto={makeImagePath(nowPlaying?.results[0].backdrop_path || "")}
-          >
-            <Title>{nowPlaying?.results[0].title}</Title>
-            <Overview>{nowPlaying?.results[0].overview}</Overview>
-          </Banner>
-        </>
+        <Banner
+          bgPhoto={makeImagePath(nowPlaying?.results[0].backdrop_path || "")}
+        >
+          <Title>{nowPlaying?.results[0].title}</Title>
+          <Overview>{nowPlaying?.results[0].overview}</Overview>
+        </Banner>
       )}
       <Body>
+        {/* ============= Movie Section 1 ================*/}
         {nowPlayingLoading || !nowPlaying ? (
           <Loader>"loading"</Loader>
         ) : (
-          <MovieSection title="현재 상영 중인 영화!" movieList={nowPlaying} />
+          <Slider
+            sectionTitle="현재 상영 중인 영화!"
+            dataLength={nowPlaying.results.length}
+          >
+            {nowPlaying.results.map((movie) => (
+              <Movie movie={movie} sectionTitle="현재 상영 중인 영화!"></Movie>
+            ))}
+          </Slider>
         )}
 
+        {/* ============= Movie Section 2 ================*/}
         {topRadtedLoading || !topRated ? (
           <Loader>"loading"</Loader>
         ) : (
-          <MovieSection title="높은 평점!" movieList={topRated} />
+          <Slider
+            sectionTitle="높은 평점!"
+            dataLength={topRated.results.length}
+          >
+            {topRated.results.map((movie) => (
+              <Movie movie={movie} sectionTitle="높은 평점!"></Movie>
+            ))}
+          </Slider>
         )}
+
+        {/* ============= Movie Modal ================*/}
         <AnimatePresence>
           {movieModalMatch?.params.id &&
           movieModalMatch?.params.title &&

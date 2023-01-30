@@ -1,12 +1,17 @@
 import styled from "styled-components";
 import Logo from "./Svg/Logo";
-import { Link, useMatch } from "react-router-dom";
+import { Link, useMatch, useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+
+interface IForm {
+  keyword: string;
+}
 
 const Nav = styled(motion.nav)`
   width: 100%;
-  height: 100px;
+  height: 95px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -37,16 +42,16 @@ const Item = styled.li`
 `;
 const Circle = styled(motion.span)`
   position: absolute;
-  bottom: -7px;
+  bottom: -8px;
   right: 0;
   left: 0;
   margin: 0 auto;
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   background-color: ${(props) => props.theme.red};
   border-radius: 50%;
 `;
-const SearchButton = styled(motion.span)`
+const SearchForm = styled(motion.form)`
   margin-right: 50px;
   cursor: pointer;
   display: flex;
@@ -75,6 +80,8 @@ const Svg = styled(motion.svg)`
 `;
 
 function Header() {
+  const { register, handleSubmit } = useForm<IForm>();
+  const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch = useMatch("/");
   const modalMatch = useMatch("/movies/:title/:id");
@@ -89,10 +96,12 @@ function Header() {
     ]
   );
 
-  useEffect(() => {}, [searchOpen]);
-
   const toggleSearch = () => {
     setSearchOpen((cur) => !cur);
+  };
+  const onValid = (data: IForm) => {
+    console.log(data);
+    navigate(`/search?keyword=${data.keyword}`);
   };
 
   return (
@@ -101,20 +110,17 @@ function Header() {
         <Logo />
         <Items>
           <Item>
-            <Link to="/">
-              Home
-              {homeMatch || modalMatch ? <Circle layoutId="circle" /> : null}
-            </Link>
+            <Link to="/">Home</Link>
+            {homeMatch || modalMatch ? <Circle layoutId="circle" /> : null}
           </Item>
           <Item>
-            <Link to="/tv">
-              Tv Shows{tvMatch ? <Circle layoutId="circle" /> : null}
-            </Link>
+            <Link to="/tv">Tv Shows</Link>
+            {tvMatch ? <Circle layoutId="circle" /> : null}
           </Item>
         </Items>
       </Col>
       <Col>
-        <SearchButton>
+        <SearchForm onSubmit={handleSubmit(onValid)}>
           <Svg
             initial={{ x: 0 }}
             animate={{ x: searchOpen ? -250 : 0 }}
@@ -137,12 +143,13 @@ function Header() {
             </g>
           </Svg>
           <Input
+            {...register("keyword", { required: true })}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: searchOpen ? 1 : 0 }}
             transition={{ ease: "easeOut" }}
             placeholder="Search for movie or tv show"
           />
-        </SearchButton>
+        </SearchForm>
       </Col>
     </Nav>
   );

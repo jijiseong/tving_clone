@@ -95,7 +95,9 @@ function MovieModal({ movie, sectionTitle }: movieModalProps) {
         exit={{ opacity: 0 }}
       />
       <Modal layoutId={movie.id + sectionTitle}>
-        {movie ? <ImgBox bgimage={makeImagePath(movie.backdrop_path)} /> : null}
+        {movie ? (
+          <ImgBox bgimage={makeImagePath(movie.backdrop_path, "w500")} />
+        ) : null}
 
         <Body>
           <Title>{movie?.title}</Title>

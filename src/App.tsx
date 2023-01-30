@@ -60,7 +60,20 @@ body {
   line-height: 1.2;
   background-color: ${(props) => props.theme.black.veryDark};
   overflow-x: hidden;
-  
+  ::-webkit-scrollbar{ // 스크롤 바 전체
+    background-color: ${(props) => props.theme.black.lighter};
+    border-radius:2px;
+    width: 13px;
+  }
+  ::-webkit-scrollbar-thumb { // 스크롤 막대
+    background-color: ${(props) => props.theme.black.darker};
+    border: 1px solid transparent;
+    border-radius:4px;
+    background-clip: padding-box;
+    :hover{
+      background-color: ${(props) => props.theme.black.veryDark};      
+    }
+  }
 }
 a {
   text-decoration:none;

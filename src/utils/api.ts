@@ -18,6 +18,21 @@ export interface IMovie {
   vote_average: number;
   vote_count: number;
 }
+export interface ITv {
+  backdrop_path: string;
+  first_air_date: string;
+  genre_ids: Array<number>;
+  id: number;
+  name: string;
+  origin_country: Array<string>;
+  original_language: string;
+  original_name: string;
+  overview: string;
+  popularity: number;
+  poster_path: string;
+  vote_average: number;
+  vote_count: number;
+}
 
 export interface IGetMovieDetail {
   adult: boolean;
@@ -76,6 +91,12 @@ export interface IGetMoviesResult {
   total_pages: number;
   total_results: number;
 }
+export interface IGetTvResult {
+  page: number;
+  results: ITv[];
+  total_pages: number;
+  total_results: number;
+}
 
 export function getNowPlaying() {
   return fetch(
@@ -93,4 +114,16 @@ export function getMovieDetail(id: string) {
   return fetch(`${API_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`).then(
     (res) => res.json()
   );
+}
+
+export function getSearchMovie(keyword: string, page: string) {
+  return fetch(
+    `${API_URL}/search/movie?api_key=${API_KEY}&language=en-US&query=${keyword}&page=${page}&include_adult=false&region=kr`
+  ).then((res) => res.json());
+}
+
+export function getOnTheAir() {
+  return fetch(
+    `${API_URL}/tv/on_the_air?api_key=${API_KEY}&language=en-US&page=1`
+  ).then((res) => res.json());
 }
