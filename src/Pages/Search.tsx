@@ -22,11 +22,6 @@ const Movie = styled.div`
 const Img = styled.img`
   border-radius: 5px;
 `;
-const NullBox = styled.div`
-  background-color: ${(props) => props.theme.black.darker};
-  width: 500px;
-  height: 281px;
-`;
 
 function Search() {
   const location = useLocation();

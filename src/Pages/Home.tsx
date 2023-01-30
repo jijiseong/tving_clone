@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 const Body = styled.div`
   width: 100%;
   position: relative;
-  top: -200px;
+  top: -10vw;
 `;
 
 const Loader = styled.div`
@@ -34,6 +34,8 @@ const Banner = styled.div<{ bgPhoto: string }>`
   flex-direction: column;
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 1)),
     url(${(props) => props.bgPhoto});
+  background-size: cover;
+  background-position: center;
   z-index: -1;
 `;
 const Overview = styled.div`
@@ -87,7 +89,11 @@ function Home() {
             dataLength={nowPlaying.results.length}
           >
             {nowPlaying.results.map((movie) => (
-              <Movie movie={movie} sectionTitle="현재 상영 중인 영화!"></Movie>
+              <Movie
+                key={movie.id}
+                movie={movie}
+                sectionTitle="현재 상영 중인 영화!"
+              ></Movie>
             ))}
           </Slider>
         )}
@@ -101,7 +107,11 @@ function Home() {
             dataLength={topRated.results.length}
           >
             {topRated.results.map((movie) => (
-              <Movie movie={movie} sectionTitle="높은 평점!"></Movie>
+              <Movie
+                key={movie.id}
+                movie={movie}
+                sectionTitle="높은 평점!"
+              ></Movie>
             ))}
           </Slider>
         )}

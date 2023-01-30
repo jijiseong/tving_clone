@@ -1,37 +1,39 @@
-import { AnimatePresence, motion, PanInfo, Variants } from "framer-motion";
-import { useState } from "react";
-import { useRecoilState } from "recoil";
+import { AnimatePresence, motion, PanInfo, useAnimation } from "framer-motion";
+import { useRef, useState } from "react";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
 import { dragState } from "../atoms";
 import useWindowWidth from "../utils/useWindowDimensions";
-
-const LEFT = -1;
-const RIGHT = 1;
-const OFFSET = 6;
-
-interface IslideObj {
-  direction: number;
-  windowWidth: number;
-}
+import { MdArrowForwardIos, MdArrowBackIos } from "react-icons/md";
+const NEXT = -1;
+const PREV = 1;
+const OFFSET = 5;
 
 const Section = styled.section`
-  width: 100vw;
+  width: 99.3vw;
   h2 {
     font-size: 30px;
-    margin-left: 30px;
+    margin-next: 30px;
     margin-bottom: 20px;
     font-weight: 900;
   }
-  height: 300px;
-  margin-bottom: 80px;
+  height: 20vw;
+  margin-bottom: 2vw;
+`;
+const SectionHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+const Page = styled.div`
+  margin-right: 5vw;
 `;
 const Body = styled(motion.div)`
   position: relative;
-  height: 200px;
+  height: 10vw;
 `;
 const Row = styled(motion.div)`
   display: flex;
-  gap: 12px;
   position: absolute;
   height: 100%;
   margin-bottom: 10px;
@@ -39,31 +41,20 @@ const Row = styled(motion.div)`
 
 const Button = styled(motion.button)<{ direction: number }>`
   position: absolute;
-  right: ${(props) => (props.direction === LEFT ? null : 0)};
+  right: ${(props) => (props.direction === NEXT ? null : 0)};
   height: 100%;
   background: linear-gradient(
     rgba(0, 0, 0, 0),
     rgba(0, 0, 0, 1),
     rgba(0, 0, 0, 0)
   );
+  padding: 0.5vw;
+  height: 13vw;
+  width: 2.5vw;
   cursor: pointer;
   border: 0;
   color: ${(props) => props.theme.white.lighter};
 `;
-const rowVars: Variants = {
-  hidden: (slideObj: IslideObj) => {
-    const { direction, windowWidth } = slideObj;
-
-    return {
-      x: direction === LEFT ? -windowWidth + 10 : windowWidth - 10,
-    };
-  },
-  visible: { x: 0 },
-  exit: (slideObj: IslideObj) => {
-    const { direction, windowWidth } = slideObj;
-    return { x: direction === LEFT ? windowWidth - 10 : -windowWidth + 10 };
-  },
-};
 
 interface sliderProps {
   dataLength: number;
@@ -71,77 +62,59 @@ interface sliderProps {
   children: React.ReactNode;
 }
 function Slider({ dataLength, sectionTitle, children }: sliderProps) {
-  const [isDragging, setIsDragging] = useRecoilState(dragState);
-  const [dragConst, setDragConst] = useState([0, 0]);
+  const slideAni = useAnimation();
   const windowWidth = useWindowWidth();
-  const [[page, direction], setPage] = useState([0, 0]);
-  const [leaving, setLeaving] = useState(false);
-  const slideObj: IslideObj = { direction, windowWidth };
+  const [page, setPage] = useState(0);
+  const setIsDragging = useSetRecoilState(dragState);
+  const maxPage = Math.ceil(dataLength / OFFSET) - 1;
+  const dragConstRef = useRef<HTMLDivElement>(null);
 
   const paginate = (newDirection: number) => {
-    if (leaving) return;
-    const maxPage = Math.ceil(dataLength / OFFSET);
     const newPage = page + newDirection;
-    if (newPage < 0) {
-      setPage([maxPage, newDirection]);
-    } else if (newPage >= maxPage) {
-      setPage([-1, newDirection]);
+    if (newPage < 0 || newPage > maxPage) {
+      slideAni.start({ x: -windowWidth * page });
+    } else {
+      setPage((cur) => cur + newDirection);
+      slideAni.start({ x: -windowWidth * newPage });
     }
-    setPage((cur) => {
-      return [cur[0] + newDirection, newDirection];
-    });
-    toggleLeaving();
   };
-  const toggleLeaving = () => {
-    setLeaving((cur) => !cur);
+  const onDragEnd = (info: PanInfo) => {
+    let newDirection = 0;
+    if (info.offset.x < -500) {
+      newDirection = 1;
+    } else if (info.offset.x > 500) {
+      newDirection = -1;
+    } else {
+      newDirection = 0;
+    }
+    paginate(newDirection);
   };
-
-  //   const onDragEnd = (
-  //     event: MouseEvent | TouchEvent | PointerEvent,
-  //     info: PanInfo
-  //   ) => {
-  //     setDragStart(false);
-  //     console.log(info.offset.x);
-  //     if (info.offset.x > 500) {
-  //       console.log("prevPage");
-  //       setDragConst((cur) => {
-  //         return [cur[0] + 1920, cur[1] + 1920];
-  //       });
-  //     } else if (info.offset.x < -500) {
-  //       console.log("nextPage");
-  //       setDragConst((cur) => {
-  //         return [cur[0] - 1920, cur[1] - 1920];
-  //       });
-  //     } else {
-  //       console.log("curPage");
-  //     }
-  //   };
-
   return (
     <Section>
-      <h2>{sectionTitle}</h2>
+      <SectionHeader>
+        <h2>{sectionTitle}</h2>
+        <Page>
+          {page} / {maxPage}
+        </Page>
+      </SectionHeader>
       <Body>
-        <AnimatePresence
-          initial={false}
-          custom={slideObj}
-          onExitComplete={toggleLeaving}
-        >
+        <AnimatePresence initial={false}>
           <Row
-            exit="exit"
-            custom={slideObj}
+            animate={slideAni}
             transition={{ duration: 0.5, ease: "easeOut" }}
             drag="x"
-            dragConstraints={{ left: -4330, right: 0 }}
-            dragElastic={0.5}
+            dragSnapToOrigin
+            onDragEnd={(_, info) => onDragEnd(info)}
+            onDragStart={() => setIsDragging(true)}
           >
             {children}
           </Row>
         </AnimatePresence>
-        <Button direction={RIGHT} onClick={() => paginate(RIGHT)}>
-          next
+        <Button direction={PREV} onClick={() => paginate(PREV)}>
+          <MdArrowForwardIos size={40} />
         </Button>
-        <Button direction={LEFT} onClick={() => paginate(LEFT)}>
-          prev
+        <Button direction={NEXT} onClick={() => paginate(NEXT)}>
+          <MdArrowBackIos size={40} />
         </Button>
       </Body>
     </Section>

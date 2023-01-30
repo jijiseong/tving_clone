@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Logo from "./Svg/Logo";
 import { Link, useMatch, useNavigate } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface IForm {
@@ -11,7 +11,7 @@ interface IForm {
 
 const Nav = styled(motion.nav)`
   width: 100%;
-  height: 95px;
+  height: 4vw;
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -63,12 +63,12 @@ body {
   ::-webkit-scrollbar{ // 스크롤 바 전체
     background-color: ${(props) => props.theme.black.lighter};
     border-radius:2px;
-    width: 13px;
+    width: 0.7vw;
   }
   ::-webkit-scrollbar-thumb { // 스크롤 막대
     background-color: ${(props) => props.theme.black.darker};
-    border: 1px solid transparent;
-    border-radius:4px;
+    border: 0.1vw solid transparent;
+    border-radius: 0.5vw;
     background-clip: padding-box;
     :hover{
       background-color: ${(props) => props.theme.black.veryDark};      
